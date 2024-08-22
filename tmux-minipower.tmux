@@ -28,6 +28,7 @@ session_icon="$(tmux_get '@tmux_minipower_session_icon' '')"
 user_icon="$(tmux_get '@tmux_minipower_user_icon' '')"
 time_icon="$(tmux_get '@tmux_minipower_time_icon' '')"
 date_icon="$(tmux_get '@tmux_minipower_date_icon' '')"
+trim_icon="$(tmux_get '@tmux_minipower_trim_icon' '•')"
 
 day_format=$(tmux_get @tmux_minipower_day_format '%a')
 date_format=$(tmux_get @tmux_minipower_date_format '%F')
@@ -69,14 +70,14 @@ tmux_set status-left-fg "$G12"
 tmux_set status-left-length 150
 LS="#[fg=colour255,bg=colour24] #S:#I.#P #[fg=colour24,bg=colour2]${rarrow}"
 LS+="#[fg=colour232,bg=colour2] #h #[fg=colour2,bg=colour24]${rarrow}"
-LS+="#[fg=colour255,bg=colour24] #{pane_current_path} #[fg=colour24,bg=$BG]${rarrow}"
+LS+="#[fg=colour255,bg=colour24] #{=|-40|${trim_icon} :pane_current_path} #[fg=colour24,bg=$BG]${rarrow}"
 tmux_set status-left "$LS"
 
 # Right side of status bar
 tmux_set status-right-bg "$BG"
 tmux_set status-right-fg "$G12"
 tmux_set status-right-length 150
-RS="#[fg=colour24]${larrow}#[fg=colour255,bg=colour24] #{pane_mode} "
+RS="#[fg=colour24]${larrow}#[fg=colour255,bg=colour24] #{?client_prefix,Prefix,Normal} #{?mouse,${trim_icon} Mouse,} #{?pane_in_mode,${trim_icon} #{pane_mode},} "
 RS+="#[fg=colour2,bg=colour24]${larrow}#[fg=colour232,bg=colour2] weather "
 RS+="#[fg=colour24,bg=colour2]${larrow}#[fg=colour255,bg=colour24] ${day_format} ${date_format} ${time_format} "
 tmux_set status-right "$RS"
