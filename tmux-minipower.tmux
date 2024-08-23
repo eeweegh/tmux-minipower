@@ -24,95 +24,92 @@ larrow=$(tmux_get '@tmux_minipower_left_arrow_icon' '')
 rlarrow=$(tmux_get '@tmux_minipower_right_light_arrow_icon' '')
 llarrow=$(tmux_get '@tmux_minipower_left_light_arrow_icon' '')
 
-session_icon="$(tmux_get '@tmux_minipower_session_icon' '')"
-user_icon="$(tmux_get '@tmux_minipower_user_icon' '')"
-time_icon="$(tmux_get '@tmux_minipower_time_icon' '')"
-date_icon="$(tmux_get '@tmux_minipower_date_icon' '')"
 trim_icon="$(tmux_get '@tmux_minipower_trim_icon' '•')"
 
 day_format=$(tmux_get @tmux_minipower_day_format '%a')
 date_format=$(tmux_get @tmux_minipower_date_format '%F')
 time_format=$(tmux_get @tmux_minipower_time_format '%H:%M')
 
-TC='#87ceeb'
+# default bg and fg
+fg=$(tmux_get @tmux_minipower_fg_color colour241)
+bg=$(tmux_get @tmux_minipower_bg_color colour235)
 
+# pane colour
+pc=$(tmux_get @tmux_minipower_bg_color colour238)
 
-G01=colour232
-G02=colour233
-G03=colour234
-G04=colour235
-G05=colour236
-G06=colour237
-G07=colour238
-G08=colour239
-G09=colour240
-G10=colour241
-G11=colour242
-G12=colour243
+# theme colour
+tc=$(tmux_get @tmux_minipower_bg_color colour23)
 
-FG=colour241
-BG=colour235
+# [odd/even][fg/bg] colors for segments
+ofgc=$(tmux_get @tmux_minipower_odd_segment_fg_color colour255)
+efgc=$(tmux_get @tmux_minipower_even_segment_fg_color colour232)
+obgc=$(tmux_get @tmux_minipower_odd_segment_bg_color colour24)
+ebgc=$(tmux_get @tmux_minipower_even_segment_bg_color colour2)
 
 # Status options
-tmux_set status-interval 1
 tmux_set status on
+tmux_set status-interval 1
+tmux_set status-justify centre
 
 # Basic status bar colors
-tmux_set status-fg "$FG"
-tmux_set status-bg "$BG"
+tmux_set status-fg "${fg}"
+tmux_set status-bg "${bg}"
 tmux_set status-attr none
 
+# whatever, tput cols does not work yet, default-size=80
+width=300
 
-#     
-# Left side of status bar
-tmux_set status-left-bg "$G04"
-tmux_set status-left-fg "$G12"
-tmux_set status-left-length 150
-LS="#[fg=colour255,bg=colour24] #S:#I.#P #[fg=colour24,bg=colour2]${rarrow}"
-LS+="#[fg=colour232,bg=colour2] #h #[fg=colour2,bg=colour24]${rarrow}"
-LS+="#[fg=colour255,bg=colour24] #{=|-40|${trim_icon} :pane_current_path} #[fg=colour24,bg=$BG]${rarrow}"
-tmux_set status-left "$LS"
+# left status
+tmux_set status-left-bg "${bg}"
+tmux_set status-left-fg "${fg}"
+tmux_set status-left-length $(($width / 3))
+BUF="#[fg=${ofgc},bg=${obgc}] #S:#I.#P #[fg=${obgc},bg=${ebgc}]${rarrow}"
+BUF+="#[fg=${efgc},bg=${ebgc}] #h #[fg=${ebgc},bg=${obgc}]${rarrow}"
+BUF+="#[fg=${ofgc},bg=${obgc}] #{=|-$(($width / 6))|${trim_icon} :pane_current_path} #[fg=${obgc},bg=${bg}]${rarrow}"
+tmux_set status-left "$BUF"
 
-# Right side of status bar
-tmux_set status-right-bg "$BG"
-tmux_set status-right-fg "$G12"
-tmux_set status-right-length 150
-RS="#[fg=colour24]${larrow}#[fg=colour255,bg=colour24] #{?client_prefix,Prefix,Normal} #{?mouse,${trim_icon} Mouse,} #{?pane_in_mode,${trim_icon} #{pane_mode},} "
-RS+="#[fg=colour2,bg=colour24]${larrow}#[fg=colour232,bg=colour2] weather "
-RS+="#[fg=colour24,bg=colour2]${larrow}#[fg=colour255,bg=colour24] ${day_format} ${date_format} ${time_format} "
-tmux_set status-right "$RS"
+# right status
+tmux_set status-right-bg "${bg}"
+tmux_set status-right-fg "${fg}"
+tmux_set status-right-length $(($width / 3))
+BUF="#[fg=${obgc}]${larrow}#[fg=${ofgc},bg=${obgc}] #{?client_prefix,Prefix,Normal} #{?mouse,${trim_icon} Mouse,} #{?pane_in_mode,${trim_icon} #{pane_mode},} "
+BUF+="#[fg=${ebgc},bg=${obgc}]${larrow}#[fg=${efgc},bg=${ebgc}] weather "
+BUF+="#[fg=${obgc},bg=${ebgc}]${larrow}#[fg=${ofgc},bg=${obgc}] ${day_format} ${date_format} ${time_format} "
+tmux_set status-right "$BUF"
 
 # Window status format
-tmux_set window-status-format         "#[fg=$BG,bg=$G06]$rarrow#[fg=$TC,bg=$G06] #I:#W #[fg=$G06,bg=$BG]$rarrow"
-tmux_set window-status-current-format "#[fg=$BG,bg=$TC]$rarrow#[fg=$BG,bg=$TC] #I:#W #[fg=$TC,bg=$BG]$rarrow"
+BUF="#[fg=${obgc},bg=${bg}] #I#{?window_flags,#F, } $rlarrow #W "
+tmux_set window-status-format "$BUF"
+BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I#F $rlarrow #W #[fg=${obgc},bg=${bg}]$rarrow"
+tmux_set window-status-current-format "$BUF"
 
 # Window status style
-tmux_set window-status-style          "fg=$TC,bg=$BG,none"
-tmux_set window-status-last-style     "fg=$TC,bg=$BG"
-tmux_set window-status-activity-style "fg=$TC,bg=$BG"
+tmux_set window-status-style          "fg=${tc},bg=${bg},none"
+tmux_set window-status-last-style     "fg=${tc},bg=${bg}"
+tmux_set window-status-activity-style "fg=${tc},bg=${bg}"
 
 # Window separator
 tmux_set window-status-separator ""
 
 # Pane border
-tmux_set pane-border-style "fg=$G07,bg=default"
+tmux_set pane-border-style "fg=${pc},bg=default"
 
 # Active pane border
-tmux_set pane-active-border-style "fg=$TC,bg=default"
+tmux_set pane-active-border-style "fg=${tc},bg=default"
 
 # Pane number indicator
-tmux_set display-panes-colour "$G07"
-tmux_set display-panes-active-colour "$TC"
+tmux_set display-panes-colour "${pc}"
+tmux_set display-panes-active-colour "${tc}"
 
 # Clock mode
-tmux_set clock-mode-colour "$TC"
+tmux_set clock-mode-colour "${tc}"
 tmux_set clock-mode-style 24
 
 # Message
-tmux_set message-style "fg=$TC,bg=$BG"
+tmux_set message-style "fg=${tc},bg=${bg}"
 
 # Command message
-tmux_set message-command-style "fg=$TC,bg=$BG"
+tmux_set message-command-style "fg=${tc},bg=${bg}"
 
 # Copy mode highlight
-tmux_set mode-style "bg=$TC,fg=$FG"
+tmux_set mode-style "bg=${tc},fg=${fg}"
