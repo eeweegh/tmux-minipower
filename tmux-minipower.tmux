@@ -73,7 +73,7 @@ tmux_set status-left "$BUF"
 tmux_set status-right-bg "${bg}"
 tmux_set status-right-fg "${fg}"
 tmux_set status-right-length $(($width / 3))
-BUF="#[fg=${obgc}]${larrow}#[fg=${ofgc},bg=${obgc}] #{?client_prefix,prefix,normal} #{?mouse,${sep} mouse,} #{?pane_in_mode,${sep} #{s|_node||:pane_mode},} "
+BUF="#[fg=${obgc}]${larrow}#[fg=${ofgc},bg=${obgc}] #{?client_prefix,prefix,normal} #{?mouse,${sep} mouse,} #{?pane_in_mode,${sep} #{s|-node||:pane_mode},} "
 BUF+="#[fg=${ebgc},bg=${obgc}]${larrow}#[fg=${efgc},bg=${ebgc}] weather "
 BUF+="#[fg=${obgc},bg=${ebgc}]${larrow}#[fg=${ofgc},bg=${obgc}] ${day_format} ${date_format} ${time_format} "
 tmux_set status-right "$BUF"
