@@ -24,7 +24,8 @@ larrow=$(tmux_get '@tmux_minipower_left_arrow_icon' '')
 rlarrow=$(tmux_get '@tmux_minipower_right_light_arrow_icon' '')
 llarrow=$(tmux_get '@tmux_minipower_left_light_arrow_icon' '')
 
-trim_icon="$(tmux_get '@tmux_minipower_trim_icon' '•')"
+trim="$(tmux_get '@tmux_minipower_trim_icon' '•')"
+sep="$(tmux_get '@tmux_minipower_separator_icon' '•')"
 
 day_format=$(tmux_get @tmux_minipower_day_format '%a')
 date_format=$(tmux_get @tmux_minipower_date_format '%F')
@@ -65,14 +66,14 @@ tmux_set status-left-fg "${fg}"
 tmux_set status-left-length $(($width / 3))
 BUF="#[fg=${ofgc},bg=${obgc}] #S:#I.#P #[fg=${obgc},bg=${ebgc}]${rarrow}"
 BUF+="#[fg=${efgc},bg=${ebgc}] #h #[fg=${ebgc},bg=${obgc}]${rarrow}"
-BUF+="#[fg=${ofgc},bg=${obgc}] #{=|-$(($width / 6))|${trim_icon} :pane_current_path} #[fg=${obgc},bg=${bg}]${rarrow}"
+BUF+="#[fg=${ofgc},bg=${obgc}] #{=|-$(($width / 6))|${trim} :pane_current_path} #[fg=${obgc},bg=${bg}]${rarrow}"
 tmux_set status-left "$BUF"
 
 # right status
 tmux_set status-right-bg "${bg}"
 tmux_set status-right-fg "${fg}"
 tmux_set status-right-length $(($width / 3))
-BUF="#[fg=${obgc}]${larrow}#[fg=${ofgc},bg=${obgc}] #{?client_prefix,Prefix,Normal} #{?mouse,${trim_icon} Mouse,} #{?pane_in_mode,${trim_icon} #{pane_mode},} "
+BUF="#[fg=${obgc}]${larrow}#[fg=${ofgc},bg=${obgc}] #{?client_prefix,prefix,normal} #{?mouse,${sep} mouse,} #{?pane_in_mode,${sep} #{pane_mode},} "
 BUF+="#[fg=${ebgc},bg=${obgc}]${larrow}#[fg=${efgc},bg=${ebgc}] weather "
 BUF+="#[fg=${obgc},bg=${ebgc}]${larrow}#[fg=${ofgc},bg=${obgc}] ${day_format} ${date_format} ${time_format} "
 tmux_set status-right "$BUF"
