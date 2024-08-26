@@ -47,6 +47,8 @@ efgc=$(tmux_get @tmux_minipower_even_segment_fg_color colour232)
 obgc=$(tmux_get @tmux_minipower_odd_segment_bg_color colour24)
 ebgc=$(tmux_get @tmux_minipower_even_segment_bg_color colour2)
 
+user=$(whoami)
+
 # Status options
 tmux_set status on
 tmux_set status-interval 1
@@ -65,7 +67,7 @@ tmux_set status-left-bg "${bg}"
 tmux_set status-left-fg "${fg}"
 tmux_set status-left-length $(($width / 3))
 BUF="#[fg=${ofgc},bg=${obgc}] #S:#I.#P #[fg=${obgc},bg=${ebgc}]${rarrow}"
-BUF+="#[fg=${efgc},bg=${ebgc}] #h #[fg=${ebgc},bg=${obgc}]${rarrow}"
+BUF+="#[fg=${efgc},bg=${ebgc}] ${user}, #h #[fg=${ebgc},bg=${obgc}]${rarrow}"
 BUF+="#[fg=${ofgc},bg=${obgc}] #{=|-$(($width / 6))|${trim} :pane_current_path} #[fg=${obgc},bg=${bg}]${rarrow}"
 tmux_set status-left "$BUF"
 
