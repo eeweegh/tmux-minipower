@@ -66,7 +66,7 @@ width=300
 tmux_set status-left-bg "${bg}"
 tmux_set status-left-fg "${fg}"
 tmux_set status-left-length $(($width / 3))
-BUF="#[fg=${ofgc},bg=${obgc}] #S:#I.#P #[fg=${obgc},bg=${ebgc}]${rarrow}"
+BUF="#[fg=${ofgc},bg=${obgc}] #S:#I.#P ${sep} #{pane_tty}#[fg=${obgc},bg=${ebgc}]${rarrow}"
 BUF+="#[fg=${efgc},bg=${ebgc}] ${user}, #h #[fg=${ebgc},bg=${obgc}]${rarrow}"
 BUF+="#[fg=${ofgc},bg=${obgc}] #{=|-$(($width / 6))|${trim} :pane_current_path} #[fg=${obgc},bg=${bg}]${rarrow}"
 tmux_set status-left "$BUF"
@@ -81,9 +81,9 @@ BUF+="#[fg=${obgc},bg=${ebgc}]${larrow}#[fg=${ofgc},bg=${obgc}] ${day_format} ${
 tmux_set status-right "$BUF"
 
 # Window status format
-BUF="#[fg=${obgc},bg=${bg}] #I#{?window_flags,#F, } $rlarrow #W "
+BUF="#[fg=${obgc},bg=${bg}] #I#{?window_flags,#{s/[*]//:window_flags},} ${sep} #W "
 tmux_set window-status-format "$BUF"
-BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I#F $rlarrow #W #[fg=${obgc},bg=${bg}]$rarrow"
+BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I#{s/[!]/DING!/:window_flags} ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
 tmux_set window-status-current-format "$BUF"
 
 # Window status style
