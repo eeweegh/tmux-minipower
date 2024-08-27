@@ -27,7 +27,8 @@ llarrow=$(tmux_get '@tmux_minipower_left_light_arrow_icon' '')
 trim="$(tmux_get '@tmux_minipower_trim_icon' '•')"
 sep="$(tmux_get '@tmux_minipower_separator_icon' '•')"
 bell="$(tmux_get '@tmux_minipower_bell_icon' '🔔')"
-prev="$(tmux_get '@tmux_minipower_prev_icon' '⏪')"
+prev="$(tmux_get '@tmux_minipower_prev_icon' '⤿')"
+active="$(tmux_get '@tmux_minipower_active_icon' '🗲')"
 
 day_format=$(tmux_get @tmux_minipower_day_format '%a')
 date_format=$(tmux_get @tmux_minipower_date_format '%F')
@@ -68,7 +69,7 @@ width=300
 tmux_set status-left-bg "${bg}"
 tmux_set status-left-fg "${fg}"
 tmux_set status-left-length $(($width / 3))
-BUF="#[fg=${ofgc},bg=${obgc}] #S:#I.#P ${sep} #{pane_tty}#[fg=${obgc},bg=${ebgc}]${rarrow}"
+BUF="#[fg=${ofgc},bg=${obgc}] #S:#I.#P ${sep} #{pane_tty} #[fg=${obgc},bg=${ebgc}]${rarrow}"
 BUF+="#[fg=${efgc},bg=${ebgc}] ${user}, #h #[fg=${ebgc},bg=${obgc}]${rarrow}"
 BUF+="#[fg=${ofgc},bg=${obgc}] #{=|-$(($width / 6))|${trim} :pane_current_path} #[fg=${obgc},bg=${bg}]${rarrow}"
 tmux_set status-left "$BUF"
@@ -82,9 +83,16 @@ BUF+="#[fg=${ebgc},bg=${obgc}]${larrow}#[fg=${efgc},bg=${ebgc}] weather "
 BUF+="#[fg=${obgc},bg=${ebgc}]${larrow}#[fg=${ofgc},bg=${obgc}] ${day_format} ${date_format} ${time_format} "
 tmux_set status-right "$BUF"
 
-# Window status format
-BUF="#[fg=${obgc},bg=${bg}] #I#{?window_flags,#{s/["'!'"]/ ${bell}/:#{s/-/ ${prev}/:window_flags}},} ${sep} #W "
+#
+# non active window
+# replace - (previous), # (active) and ! (bell) with symbols
+#
+BUF="#[fg=${ofgc},bg=${bg}] #I #{?window_flags,#{s/["'!'"]/${bell}/:#{s/-/${prev}/:#{s/#/${active}/:window_flags}}},} ${sep} #W "
 tmux_set window-status-format "$BUF"
+#
+# current window
+# take out current window indicator, colour is clear
+#
 BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I#{s/[*]//:window_flags} ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
 tmux_set window-status-current-format "$BUF"
 
@@ -111,10 +119,10 @@ tmux_set clock-mode-colour "${tc}"
 tmux_set clock-mode-style 24
 
 # Message
-tmux_set message-style "fg=${tc},bg=${bg}"
+tmux_set message-style "fg=${ofgc},bg=${bg}"
 
 # Command message
-tmux_set message-command-style "fg=${tc},bg=${bg}"
+tmux_set message-command-style "fg=${ofgc},bg=${bg}"
 
 # Copy mode highlight
 tmux_set mode-style "bg=${tc},fg=${fg}"
