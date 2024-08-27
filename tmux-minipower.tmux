@@ -26,6 +26,8 @@ llarrow=$(tmux_get '@tmux_minipower_left_light_arrow_icon' '')
 
 trim="$(tmux_get '@tmux_minipower_trim_icon' '•')"
 sep="$(tmux_get '@tmux_minipower_separator_icon' '•')"
+bell="$(tmux_get '@tmux_minipower_bell_icon' '🔔')"
+prev="$(tmux_get '@tmux_minipower_prev_icon' '⏪')"
 
 day_format=$(tmux_get @tmux_minipower_day_format '%a')
 date_format=$(tmux_get @tmux_minipower_date_format '%F')
@@ -81,9 +83,9 @@ BUF+="#[fg=${obgc},bg=${ebgc}]${larrow}#[fg=${ofgc},bg=${obgc}] ${day_format} ${
 tmux_set status-right "$BUF"
 
 # Window status format
-BUF="#[fg=${obgc},bg=${bg}] #I#{?window_flags,#{s/[*]//:window_flags},} ${sep} #W "
+BUF="#[fg=${obgc},bg=${bg}] #I#{?window_flags,#{s/["'!'"]/ ${bell}/:#{s/-/ ${prev}/:window_flags}},} ${sep} #W "
 tmux_set window-status-format "$BUF"
-BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I#{s/[!]/DING!/:window_flags} ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
+BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I#{s/[*]//:window_flags} ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
 tmux_set window-status-current-format "$BUF"
 
 # Window status style
