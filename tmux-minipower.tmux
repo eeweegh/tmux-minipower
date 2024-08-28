@@ -70,7 +70,7 @@ tmux_set status-left-bg "${bg}"
 tmux_set status-left-fg "${fg}"
 tmux_set status-left-length $(($width / 3))
 BUF="#[fg=${ofgc},bg=${obgc}] #S:#I.#P ${sep} #{pane_tty} #[fg=${obgc},bg=${ebgc}]${rarrow}"
-BUF+="#[fg=${efgc},bg=${ebgc}] ${user}, #h #[fg=${ebgc},bg=${obgc}]${rarrow}"
+BUF+="#[fg=${efgc},bg=${ebgc}] ${user} ${sep} #h #[fg=${ebgc},bg=${obgc}]${rarrow}"
 BUF+="#[fg=${ofgc},bg=${obgc}] #{=|-$(($width / 6))|${trim} :pane_current_path} #[fg=${obgc},bg=${bg}]${rarrow}"
 tmux_set status-left "$BUF"
 
