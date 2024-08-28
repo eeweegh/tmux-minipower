@@ -29,6 +29,10 @@ sep="$(tmux_get '@tmux_minipower_separator_icon' '•')"
 bell="$(tmux_get '@tmux_minipower_bell_icon' '🔔')"
 prev="$(tmux_get '@tmux_minipower_prev_icon' '⤿')"
 active="$(tmux_get '@tmux_minipower_active_icon' '🗲')"
+zoom="$(tmux_get '@tmux_minipower_zoom_icon' '🔍')"
+mark="$(tmux_get '@tmux_minipower_mark_icon' '✓')"
+silent="$(tmux_get '@tmux_minipower_silent_icon' '💤')"
+
 
 day_format=$(tmux_get @tmux_minipower_day_format '%a')
 date_format=$(tmux_get @tmux_minipower_date_format '%F')
@@ -85,15 +89,16 @@ tmux_set status-right "$BUF"
 
 #
 # non active window
-# replace - (previous), # (active) and ! (bell) with symbols
+# replace - (previous), # (active), Z (zoomed), M (marked), ~ (inactive) and ! (bell) with symbols
 #
-BUF="#[fg=${ofgc},bg=${bg}] #I #{?window_flags,#{s/["'!'"]/${bell}/:#{s/-/${prev}/:#{s/#/${active}/:window_flags}}},} ${sep} #W "
+icons="#{?window_flags,#{s/[*]//:#{s/["'!'"]/${bell}/:#{s/-/${prev}/:#{s/#/${active}/:#{s/Z/${zoom}/:#{s/M/${mark}/:#{s/~/${silent}/:window_flags}}}}}}},}"
+BUF="#[fg=${ofgc},bg=${bg}] #I ${icons} #W "
 tmux_set window-status-format "$BUF"
 #
 # current window
 # take out current window indicator, colour is clear
 #
-BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I#{s/[*]//:window_flags} ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
+BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I ${icons} ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
 tmux_set window-status-current-format "$BUF"
 
 # Window status style
