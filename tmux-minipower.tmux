@@ -91,14 +91,14 @@ tmux_set status-right "$BUF"
 # non active window
 # replace - (previous), # (active), Z (zoomed), M (marked), ~ (inactive) and ! (bell) with symbols
 #
-icons="#{?window_flags,#{s/[*]//:#{s/["'!'"]/${bell}/:#{s/-/${prev}/:#{s/#/${active}/:#{s/Z/${zoom}/:#{s/M/${mark}/:#{s/~/${silent}/:window_flags}}}}}}},}"
-BUF="#[fg=${ofgc},bg=${bg}] #I ${icons} #W "
+icons="#{?#{==:#{window_flags},"*"},,#{?window_flags, #{s/[*]//:#{s/["'!'"]/${bell}/:#{s/-/${prev}/:#{s/#/${active}/:#{s/Z/${zoom}/:#{s/M/${mark}/:#{s/~/${silent}/:window_flags}}}}}}},}}"
+BUF="#[fg=${ofgc},bg=${bg}] #I${icons} #W "
 tmux_set window-status-format "$BUF"
 #
 # current window
 # take out current window indicator, colour is clear
 #
-BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I ${icons} ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
+BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I${icons} ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
 tmux_set window-status-current-format "$BUF"
 
 # Window status style
