@@ -35,7 +35,7 @@ silent="$(tmux_get '@tmux_minipower_silent_icon' '💤')"
 
 
 day_format=$(tmux_get @tmux_minipower_day_format '%a')
-date_format=$(tmux_get @tmux_minipower_date_format '%F')
+date_format=$(tmux_get @tmux_minipower_date_format '#[dim]%Y-%m-#[nodim]%d')
 time_format=$(tmux_get @tmux_minipower_time_format '%H:%M')
 
 # default bg and fg
