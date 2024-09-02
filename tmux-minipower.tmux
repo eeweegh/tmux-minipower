@@ -24,8 +24,8 @@ larrow=$(tmux_get '@tmux_minipower_left_arrow_icon' '')
 rlarrow=$(tmux_get '@tmux_minipower_right_light_arrow_icon' '')
 llarrow=$(tmux_get '@tmux_minipower_left_light_arrow_icon' '')
 
-trim="$(tmux_get '@tmux_minipower_trim_icon' '•')"
-sep="$(tmux_get '@tmux_minipower_separator_icon' '•')"
+sep="$(tmux_get '@tmux_minipower_separator_icon' '#[dim]•#[nodim]')"
+trim="$(tmux_get '@tmux_minipower_trim_icon' ${sep})"
 bell="$(tmux_get '@tmux_minipower_bell_icon' '🔔')"
 prev="$(tmux_get '@tmux_minipower_prev_icon' '⤿')"
 active="$(tmux_get '@tmux_minipower_active_icon' '🗲')"
@@ -91,14 +91,17 @@ tmux_set status-right "$BUF"
 # non active window
 # replace - (previous), # (active), Z (zoomed), M (marked), ~ (inactive) and ! (bell) with symbols
 #
-icons="#{?#{==:#{window_flags},"*"},,#{?window_flags, #{s/[*]//:#{s/["'!'"]/${bell}/:#{s/-/${prev}/:#{s/#/${active}/:#{s/Z/${zoom}/:#{s/M/${mark}/:#{s/~/${silent}/:window_flags}}}}}}},}}"
-BUF="#[fg=${ofgc},bg=${bg}] #I${icons} #W "
+icons() {
+   # S1 is fg colour to return to if switched (like for bell)
+   echo "#{?#{==:#{window_flags},"*"},,#{?window_flags, #{s/[*]//:#{s/["'!'"]/#[fg=red]${bell}#[fg=$1]/:#{s/-/${prev}/:#{s/#/${active}/:#{s/Z/${zoom}/:#{s/M/${mark}/:#{s/~/${silent}/:window_flags}}}}}}},}}"
+}
+BUF="#[fg=${ofgc},bg=${bg}] #I$(icons ${ofgc}) #W "
 tmux_set window-status-format "$BUF"
 #
 # current window
 # take out current window indicator, colour is clear
 #
-BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I${icons} ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
+BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I$(icons ${bf}) ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
 tmux_set window-status-current-format "$BUF"
 
 # Window status style
