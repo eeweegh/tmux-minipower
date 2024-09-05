@@ -50,9 +50,9 @@ tc=$(tmux_get @tmux_minipower_theme_color colour23)
 
 # [odd/even][fg/bg] colors for segments
 ofgc=$(tmux_get @tmux_minipower_odd_segment_fg_color colour255)
-efgc=$(tmux_get @tmux_minipower_even_segment_fg_color colour235)
+efgc=$(tmux_get @tmux_minipower_even_segment_fg_color colour0)
 obgc=$(tmux_get @tmux_minipower_odd_segment_bg_color colour24)
-ebgc=$(tmux_get @tmux_minipower_even_segment_bg_color colour28)
+ebgc=$(tmux_get @tmux_minipower_even_segment_bg_color colour2)
 
 user=$(whoami)
 
