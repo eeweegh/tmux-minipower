@@ -46,13 +46,13 @@ bg=$(tmux_get @tmux_minipower_bg_color colour235)
 pc=$(tmux_get @tmux_minipower_bg_color colour238)
 
 # theme colour
-tc=$(tmux_get @tmux_minipower_bg_color colour23)
+tc=$(tmux_get @tmux_minipower_theme_color colour23)
 
 # [odd/even][fg/bg] colors for segments
 ofgc=$(tmux_get @tmux_minipower_odd_segment_fg_color colour255)
-efgc=$(tmux_get @tmux_minipower_even_segment_fg_color colour0)
+efgc=$(tmux_get @tmux_minipower_even_segment_fg_color colour235)
 obgc=$(tmux_get @tmux_minipower_odd_segment_bg_color colour24)
-ebgc=$(tmux_get @tmux_minipower_even_segment_bg_color colour2)
+ebgc=$(tmux_get @tmux_minipower_even_segment_bg_color colour28)
 
 user=$(whoami)
 
@@ -133,4 +133,4 @@ tmux_set message-style "fg=${ofgc},bg=${bg}"
 tmux_set message-command-style "fg=${ofgc},bg=${bg}"
 
 # Copy mode highlight
-tmux_set mode-style "bg=${tc},fg=${fg}"
+tmux_set mode-style "bg=${tc},fg=${ofgc}"
