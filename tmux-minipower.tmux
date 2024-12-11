@@ -54,6 +54,9 @@ efgc=$(tmux_get @tmux_minipower_even_segment_fg_color colour0)
 obgc=$(tmux_get @tmux_minipower_odd_segment_bg_color colour24)
 ebgc=$(tmux_get @tmux_minipower_even_segment_bg_color colour2)
 
+# static weather
+weather=$(openmeteo $(geolocation))
+
 user=$(whoami)
 
 # Status options
@@ -83,7 +86,7 @@ tmux_set status-right-bg "${bg}"
 tmux_set status-right-fg "${fg}"
 tmux_set status-right-length $(($width / 3))
 BUF="#[fg=${obgc}]${larrow}#[fg=${ofgc},bg=${obgc}] #{?client_prefix,prefix,normal} #{?mouse,${sep} mouse,} #{?pane_in_mode,${sep} #{s|-mode||:pane_mode},} "
-BUF+="#[fg=${ebgc},bg=${obgc}]${larrow}#[fg=${efgc},bg=${ebgc}] weather "
+BUF+="#[fg=${ebgc},bg=${obgc}]${larrow}#[fg=${efgc},bg=${ebgc}] ${weather} "
 BUF+="#[fg=${obgc},bg=${ebgc}]${larrow}#[fg=${ofgc},bg=${obgc}] ${day_format} ${date_format} ${time_format} "
 tmux_set status-right "$BUF"
 
