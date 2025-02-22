@@ -104,7 +104,7 @@ tmux_set window-status-format "$BUF"
 # current window
 # take out current window indicator, colour is clear
 #
-BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I$(icons ${bf}) ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
+BUF="#[fg=${bg},bg=${obgc}]$rarrow#[fg=${ofgc}] #I$(icons ${ofgc}) ${sep} #W #[fg=${obgc},bg=${bg}]$rarrow"
 tmux_set window-status-current-format "$BUF"
 
 # Window status style
