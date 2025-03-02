@@ -62,6 +62,11 @@ wsbg=$(tmux_get @tmux_minipower_window_status_bg_color colour24)
 wcfg=$(tmux_get @tmux_minipower_window_current_fg_color colour0)
 wcbg=$(tmux_get @tmux_minipower_window_current_bg_color colour2)
 
+# special color for prefix mode (on current window)
+wspfg=$(tmux_get @tmux_minipower_window_current_prefix_fg_color colour0)
+wspbg=$(tmux_get @tmux_minipower_window_current_prefix_bg_color colour3)
+
+# me, myself and I
 user=$(whoami)
 
 # static weather
@@ -92,11 +97,14 @@ tmux_set status-left-bg "${background}"
 tmux_set status-left-length $((width / 3))
 
 # first segment (#1, hence odd) is session:window.pane and tty for selected pane
-BUF="#[fg=${osfg},bg=${osbg}] #S:#I.#P ${sep} #{pane_tty} #[fg=${osbg},bg=${esbg}]${rarrow}"
+BUF="#[fg=${osfg},bg=${osbg}] #S:#I.#P ${sep} #{pane_tty} "
+BUF+="#[fg=${osbg},bg=${esbg}]${rarrow}"
 # second segment is user name and host
-BUF+="#[fg=${esfg},bg=${esbg}] ${user} ${sep} #h #[fg=${esbg},bg=${osbg}]${rarrow}"
+BUF+="#[fg=${esfg},bg=${esbg}] ${user} ${sep} #h "
+BUF+="#[fg=${esbg},bg=${osbg}]${rarrow}"
 # third segment is working directory
-BUF+="#[fg=${osfg},bg=${osbg}] #{=|-$((width / 6))|${trim} :pane_current_path} #[fg=${osbg},bg=${background}]${rarrow}"
+BUF+="#[fg=${osfg},bg=${osbg}] #{=|-$((width / 6))|${trim} :pane_current_path} "
+BUF+="#[fg=${osbg},bg=${background}]${rarrow}"
 #
 tmux_set status-left "${BUF}"
 
@@ -106,11 +114,14 @@ tmux_set status-right-bg "${background}"
 tmux_set status-right-length $((width / 3))
 
 # first segment is mode information, in readable words
-BUF="#[fg=${osbg}]${larrow}#[fg=${osfg},bg=${osbg}] #{?client_prefix,prefix,normal} #{?mouse,${sep} mouse,} #{?pane_in_mode,${sep} #{s|-mode||:pane_mode},} "
+BUF="#[fg=${osbg}]${larrow}"
+BUF+="#[fg=${osfg},bg=${osbg}] #{?client_prefix,prefix,normal} #{?mouse,${sep} mouse,} #{?pane_in_mode,${sep} #{s|-mode||:pane_mode},} "
 # second segment is weather
-BUF+="#[fg=${esbg},bg=${osbg}]${larrow}#[fg=${esfg},bg=${esbg}] ${weather} "
+BUF+="#[fg=${esbg},bg=${osbg}]${larrow}"
+BUF+="#[fg=${esfg},bg=${esbg}] ${weather} "
 # third segment is datetime, with highlight on day of week, day of month and time
-BUF+="#[fg=${osbg},bg=${esbg}]${larrow}#[fg=${osfg},bg=${osbg}] ${day_format} ${date_format} ${time_format} "
+BUF+="#[fg=${osbg},bg=${esbg}]${larrow}"
+BUF+="#[fg=${osfg},bg=${osbg}] ${day_format} ${date_format} ${time_format} "
 #
 tmux_set status-right "${BUF}"
 
@@ -123,6 +134,17 @@ icons() {
    echo "#{?#{==:#{window_flags},"*"},,#{?window_flags, #{s/[*]//:#{s/["'!'"]/#[fg=red]${bell}#[fg=$1]/:#{s/-/${prev}/:#{s/#/${active}/:#{s/Z/${zoom}/:#{s/M/${mark}/:#{s/~/${silent}/:window_flags}}}}}}},}}"
 }
 
+#
+# insert $1 or $2 based on window begin active, and client prefix active
+#
+acp() {
+   echo "#{?#{&&:#{window_active},#{client_prefix}},$1,$2}"
+}
+
+#
+# different color for generic status, and current
+# current becomes highlighted in prefix mode
+#
 windowsegment() {
    local current=$1 fg bg
    if [[ $current == "true" ]] ; then
@@ -133,11 +155,11 @@ windowsegment() {
       bg=${wsbg}
    fi
    # left curving side for first window in list
-   BUF="#{?window_start_flag,#[fg=${bg}]${larrow},}"
+   BUF="#{?window_start_flag,$(acp "#[fg=${wspbg}]" "#[fg=${bg}]")${larrow},}"
    # extra space when not first in list: number, icons and name
-   BUF+="#[fg=${fg},bg=${bg}]#{?window_start_flag,, }#I$(icons "${fg}") ${sep} #W "
+   BUF+="$(acp "#[fg=${wspfg}]#[bg=${wspbg}]" "#[fg=${fg}]#[bg=${bg}]")#{?window_start_flag,, }#I$(icons "${fg}") ${sep} #W "
    # right curving side for last window in list
-   BUF+="#{?window_end_flag,#[fg=${bg}#,bg=${background}]${rarrow},}"
+   BUF+="#{?window_end_flag,$(acp "#[fg=${wspbg}],#[fg=${bg}]" "#[fg=${bg}]")#[bg=${background}]${rarrow},}"
 
    echo "${BUF}"
 }
