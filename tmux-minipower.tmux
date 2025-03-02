@@ -159,7 +159,7 @@ windowsegment() {
    # extra space when not first in list: number, icons and name
    BUF+="$(acp "#[fg=${wspfg}]#[bg=${wspbg}]" "#[fg=${fg}]#[bg=${bg}]")#{?window_start_flag,, }#I$(icons "${fg}") ${sep} #W "
    # right curving side for last window in list
-   BUF+="#{?window_end_flag,$(acp "#[fg=${wspbg}],#[fg=${bg}]" "#[fg=${bg}]")#[bg=${background}]${rarrow},}"
+   BUF+="#{?window_end_flag,$(acp "#[fg=${wspbg}]" "#[fg=${bg}]")#[bg=${background}]${rarrow},}"
 
    echo "${BUF}"
 }
