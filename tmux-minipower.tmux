@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 #
-# initial copy from wfxr/tmux-power
-# attempt to keep simplicity, but boost to tmux-powerline style (albeit hardcoded)
+# inspiration from wfxr/tmux-power
+# attempt to keep simplicity/speed, but boost to tmux-powerline style (albeit hardcoded)
 #
 
 # $1: option
@@ -41,8 +41,8 @@ date_format=$(tmux_get @tmux_minipower_date_format '#[dim]%Y-%m-#[nodim]%d')
 time_format=$(tmux_get @tmux_minipower_time_format '%H:%M')
 
 # default bg and fg
-fg=$(tmux_get @tmux_minipower_fg_color colour241)
-bg=$(tmux_get @tmux_minipower_bg_color colour235)
+foreground=$(tmux_get @tmux_minipower_fg_color colour241)
+background=$(tmux_get @tmux_minipower_bg_color colour235)
 
 # pane colour
 pc=$(tmux_get @tmux_minipower_bg_color colour238)
@@ -51,16 +51,27 @@ pc=$(tmux_get @tmux_minipower_bg_color colour238)
 tc=$(tmux_get @tmux_minipower_theme_color colour23)
 
 # [odd/even][fg/bg] colors for segments
-ofgc=$(tmux_get @tmux_minipower_odd_segment_fg_color colour255)
-efgc=$(tmux_get @tmux_minipower_even_segment_fg_color colour0)
-obgc=$(tmux_get @tmux_minipower_odd_segment_bg_color colour24)
-ebgc=$(tmux_get @tmux_minipower_even_segment_bg_color colour2)
+osfg=$(tmux_get @tmux_minipower_odd_segment_fg_color colour255)
+osbg=$(tmux_get @tmux_minipower_odd_segment_bg_color colour24)
+esfg=$(tmux_get @tmux_minipower_even_segment_fg_color colour0)
+esbg=$(tmux_get @tmux_minipower_even_segment_bg_color colour2)
 
-# static weather
-# shellcheck disable=SC2046
-weather="$(openmeteo $(geolocation))"
+# window status colors (default and current)
+wsfg=$(tmux_get @tmux_minipower_window_status_fg_color colour255)
+wsbg=$(tmux_get @tmux_minipower_window_status_bg_color colour24)
+wcfg=$(tmux_get @tmux_minipower_window_current_fg_color colour0)
+wcbg=$(tmux_get @tmux_minipower_window_current_bg_color colour2)
 
 user=$(whoami)
+
+# static weather
+if ! command -v bat >/dev/null 2>&1; then
+   weather="no weather"
+else
+   # shellcheck disable=SC2046
+   weather="$(openmeteo $(geolocation))"
+fi
+
 
 # Status options
 tmux_set status on
@@ -68,54 +79,81 @@ tmux_set status-interval 1
 tmux_set status-justify centre
 
 # Basic status bar colors
-tmux_set status-fg "${fg}"
-tmux_set status-bg "${bg}"
+tmux_set status-fg "${foreground}"
+tmux_set status-bg "${background}"
 tmux_set status-attr none
 
 # whatever, tput cols does not work yet, default-size=80
 width=300
 
 # left status
-tmux_set status-left-bg "${bg}"
-tmux_set status-left-fg "${fg}"
+tmux_set status-left-fg "${foreground}"
+tmux_set status-left-bg "${background}"
 tmux_set status-left-length $((width / 3))
-BUF="#[fg=${ofgc},bg=${obgc}] #S:#I.#P ${sep} #{pane_tty} #[fg=${obgc},bg=${ebgc}]${rarrow}"
-BUF+="#[fg=${efgc},bg=${ebgc}] ${user} ${sep} #h #[fg=${ebgc},bg=${obgc}]${rarrow}"
-BUF+="#[fg=${ofgc},bg=${obgc}] #{=|-$((width / 6))|${trim} :pane_current_path} #[fg=${obgc},bg=${bg}]${rarrow}"
-tmux_set status-left "$BUF"
+
+# first segment (#1, hence odd) is session:window.pane and tty for selected pane
+BUF="#[fg=${osfg},bg=${osbg}] #S:#I.#P ${sep} #{pane_tty} #[fg=${osbg},bg=${esbg}]${rarrow}"
+# second segment is user name and host
+BUF+="#[fg=${esfg},bg=${esbg}] ${user} ${sep} #h #[fg=${esbg},bg=${osbg}]${rarrow}"
+# third segment is working directory
+BUF+="#[fg=${osfg},bg=${osbg}] #{=|-$((width / 6))|${trim} :pane_current_path} #[fg=${osbg},bg=${background}]${rarrow}"
+#
+tmux_set status-left "${BUF}"
 
 # right status
-tmux_set status-right-bg "${bg}"
-tmux_set status-right-fg "${fg}"
+tmux_set status-right-fg "${foreground}"
+tmux_set status-right-bg "${background}"
 tmux_set status-right-length $((width / 3))
-BUF="#[fg=${obgc}]${larrow}#[fg=${ofgc},bg=${obgc}] #{?client_prefix,prefix,normal} #{?mouse,${sep} mouse,} #{?pane_in_mode,${sep} #{s|-mode||:pane_mode},} "
-BUF+="#[fg=${ebgc},bg=${obgc}]${larrow}#[fg=${efgc},bg=${ebgc}] ${weather} "
-BUF+="#[fg=${obgc},bg=${ebgc}]${larrow}#[fg=${ofgc},bg=${obgc}] ${day_format} ${date_format} ${time_format} "
-tmux_set status-right "$BUF"
+
+# first segment is mode information, in readable words
+BUF="#[fg=${osbg}]${larrow}#[fg=${osfg},bg=${osbg}] #{?client_prefix,prefix,normal} #{?mouse,${sep} mouse,} #{?pane_in_mode,${sep} #{s|-mode||:pane_mode},} "
+# second segment is weather
+BUF+="#[fg=${esbg},bg=${osbg}]${larrow}#[fg=${esfg},bg=${esbg}] ${weather} "
+# third segment is datetime, with highlight on day of week, day of month and time
+BUF+="#[fg=${osbg},bg=${esbg}]${larrow}#[fg=${osfg},bg=${osbg}] ${day_format} ${date_format} ${time_format} "
+#
+tmux_set status-right "${BUF}"
 
 #
-# non active window
 # replace - (previous), # (active), Z (zoomed), M (marked), ~ (inactive) and ! (bell) with symbols
 #
 icons() {
    # S1 is fg colour to return to if switched (like for bell)
+   # take out active indicator, colour is used for that
    echo "#{?#{==:#{window_flags},"*"},,#{?window_flags, #{s/[*]//:#{s/["'!'"]/#[fg=red]${bell}#[fg=$1]/:#{s/-/${prev}/:#{s/#/${active}/:#{s/Z/${zoom}/:#{s/M/${mark}/:#{s/~/${silent}/:window_flags}}}}}}},}}"
 }
-BUF="#[fg=${ofgc},bg=${bg}] #I$(icons "${ofgc}") #W "
-tmux_set window-status-format "$BUF"
-#
-# current window
-# take out current window indicator, colour is clear
-#
-BUF="#[fg=${bg},bg=${obgc}]${rarrow}#[fg=${ofgc}] #I$(icons "${ofgc}") ${sep} #W #[fg=${obgc},bg=${bg}]${rarrow}"
-tmux_set window-status-current-format "$BUF"
 
-# Window status style
-tmux_set window-status-style          "fg=${tc},bg=${bg},none"
-tmux_set window-status-current-style  "fg=${tc},bg=${bg}"
-tmux_set window-status-last-style     "fg=${tc},bg=${bg}"
-tmux_set window-status-bell-style     "fg=${tc},bg=${bg}"
-tmux_set window-status-activity-style "fg=${tc},bg=${bg}"
+windowsegment() {
+   local current=$1 fg bg
+   if [[ $current == "true" ]] ; then
+      fg=${wcfg}
+      bg=${wcbg}
+   else
+      fg=${wsfg}
+      bg=${wsbg}
+   fi
+   # left curving side for first window in list
+   BUF="#{?window_start_flag,#[fg=${bg}]${larrow},}"
+   # extra space when not first in list: number, icons and name
+   BUF+="#[fg=${fg},bg=${bg}]#{?window_start_flag,, }#I$(icons "${fg}") ${sep} #W "
+   # right curving side for last window in list
+   BUF+="#{?window_end_flag,#[fg=${bg}#,bg=${background}]${rarrow},}"
+
+   echo "${BUF}"
+}
+
+#
+# regular (non current window format)
+#
+tmux_set window-status-format         "$(windowsegment false)"
+tmux_set window-status-current-format "$(windowsegment true)"
+
+# Window status style, just set to null, because handled inline
+tmux_set window-status-style          ""
+tmux_set window-status-current-style  ""
+tmux_set window-status-last-style     ""
+tmux_set window-status-bell-style     ""
+tmux_set window-status-activity-style ""
 
 # Window separator
 tmux_set window-status-separator ""
@@ -135,10 +173,10 @@ tmux_set clock-mode-colour "${tc}"
 tmux_set clock-mode-style 24
 
 # Message
-tmux_set message-style "fg=${ofgc},bg=${bg}"
+tmux_set message-style "fg=${osfg},bg=${background}"
 
 # Command message
-tmux_set message-command-style "fg=${ofgc},bg=${bg}"
+tmux_set message-command-style "fg=${osfg},bg=${background}"
 
 # Copy mode highlight
-tmux_set mode-style "bg=${tc},fg=${ofgc}"
+tmux_set mode-style "bg=${tc},fg=${osfg}"
