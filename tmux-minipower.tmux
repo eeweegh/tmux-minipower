@@ -70,7 +70,7 @@ wspbg=$(tmux_get @tmux_minipower_window_current_prefix_bg_color colour3)
 user=$(whoami)
 
 # static weather
-if ! command -v bat >/dev/null 2>&1; then
+if ! command -v openmeteo >/dev/null 2>&1; then
    weather="no weather"
 else
    # shellcheck disable=SC2046
